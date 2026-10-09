@@ -2,7 +2,7 @@
 
 Dodaje przycisk **Save** w nagłówku podglądu obrazka (obok menu „…”).
 Zamiast: kliknij obrazek → menu → Save, robisz: kliknij obrazek → Save.
-Zapisuje oryginał w pełnej rozdzielczości (bez parametrów `width`/`height`/`format` z proxy Discorda).
+Używa wbudowanej akcji Save Discorda, więc zapisuje oryginał w pełnej rozdzielczości.
 
 ## Instalacja
 
@@ -14,10 +14,11 @@ https://raw.githubusercontent.com/Anderinfera/revenge-quick-save/main/docs/quick
 
 ## Jak to działa
 
-- Przycisk jest doczepiony do `GIFFavButton` (gwiazdka w nagłówku podglądu, ten sam trik co FavouriteAnything).
-- Zapis idzie przez natywne `MediaManager.downloadMediaAsset(url, typ)`.
-- Liczba `typ` nie jest udokumentowana. Domyślnie: 0 = obrazek, 1 = wideo. Gdy zapiszesz coś raz przez menu „…” → Save,
-  plugin zapamięta typ użyty przez Discorda i od tej pory będzie go używał.
+- Patchuje `MediaModalOverlayHeader` (nagłówek podglądu: „X” po lewej, menu „⋮” po prawej).
+- Menu „⋮” to `ContextMenu` z listą pozycji. Pierwsza to Save Discorda (`{ label, IconComponent, action }`).
+- Plugin wstawia przed menu przycisk z tą samą ikoną i tą samą akcją, więc zapis działa dokładnie jak menu → Save
+  (oryginalny plik w pełnej rozdzielczości).
+- Gdy Discord wyłącza pobieranie (brak Save w menu), przycisk się nie pojawia.
 
 ## Zmiany
 
