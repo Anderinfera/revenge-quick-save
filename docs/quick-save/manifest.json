@@ -1,6 +1,6 @@
 {
 	"name": "QuickSave",
-	"description": "Adds a Save button to the image viewer header, next to the menu button. Saves the full-resolution file in one tap.",
+	"description": "Adds Copy link and Save buttons to the image viewer header, next to the menu button.",
 	"authors": [
 		{
 			"name": "Ander",
@@ -11,5 +11,5 @@
 	"vendetta": {
 		"icon": "DownloadIcon"
 	},
-	"hash": "8c2b428235cef2bfb76f7b18d1a53e193adca866892a595d67222f01ca669eaf"
+	"hash": "f050363469d88a3ba1bd9822df4ce5929f0a3d7b20866fe3e0b861bfe901d733"
 }

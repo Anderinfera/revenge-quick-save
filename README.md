@@ -1,6 +1,6 @@
 # QuickSave (plugin do Revenge)
 
-Dodaje przycisk **Save** w nagłówku podglądu obrazka (obok menu „…”).
+Dodaje w nagłówku podglądu obrazka (obok menu „…”) dwa przyciski: **Kopiuj link** i **Save**.
 Zamiast: kliknij obrazek → menu → Save, robisz: kliknij obrazek → Save.
 Używa wbudowanej akcji Save Discorda, więc zapisuje oryginał w pełnej rozdzielczości.
 
