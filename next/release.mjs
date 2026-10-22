@@ -1,6 +1,6 @@
 // Builds the plugins, packs each into repo/pool/<id>@<version>.zip (manifest.json + index.js at the root,
 // same layout as the template's Gradle packaging) and regenerates repo/index.json.
-// Revenge Next: Settings > Revenge > Plugins > gear > add repository URL (raw .../next/repo/index.json).
+// Revenge Next: Settings > Revenge > Plugins > gear > add repository URL: the repo/ folder URL (Revenge appends /index.json).
 import { execFileSync } from 'node:child_process'
 import { mkdirSync, readdirSync, readFileSync, writeFileSync } from 'node:fs'
 import { zipSync } from 'fflate'

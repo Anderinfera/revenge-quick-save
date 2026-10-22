@@ -6,10 +6,10 @@ Używa wbudowanej akcji Save Discorda, więc zapisuje oryginał w pełnej rozdzi
 
 ## Instalacja (Revenge Next)
 
-Settings → Revenge → Plugins → ikona zębatki → dodaj repozytorium:
+Settings → Revenge → Plugins → ikona zębatki → dodaj repozytorium (adres katalogu, bez `index.json` — Revenge dopisuje go sam):
 
 ```
-https://raw.githubusercontent.com/Anderinfera/revenge-quick-save/main/next/repo/index.json
+https://raw.githubusercontent.com/Anderinfera/revenge-quick-save/main/next/repo
 ```
 
 Potem Plugins → `+` (Browse Plugins) → QuickSave → Install.
