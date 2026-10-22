@@ -33,10 +33,10 @@
 		})
 	}
 
+	// No toast on purpose: vendetta's showToast crashed Discord's ToastContainer on newer builds,
+	// and Android 13+ already shows its own "Copied" confirmation.
 	function copyLink(source) {
-		const url = source.shareURI || source.sourceURI || source.uri
-		clipboard.setString(url)
-		ui.toasts.showToast('Skopiowano link', ui.assets.getAssetIDByName('LinkIcon'))
+		clipboard.setString(source.shareURI || source.sourceURI || source.uri)
 	}
 
 	function injectButtons(ret, source) {
