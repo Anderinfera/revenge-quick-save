@@ -14,14 +14,20 @@ https://raw.githubusercontent.com/Anderinfera/revenge-quick-save/main/next/repo
 
 Potem Plugins → `+` (Browse Plugins) → QuickSave → Install.
 
-Zmiany: edytuj `next/plugins/quick-save/js/index.ts` i podbij `version` w `next/plugins/quick-save/manifest.json`, potem:
+### Zapis do folderów (tylko Revenge Next)
 
-```
-cd next
-npm i --ignore-scripts --legacy-peer-deps
-cp -r node_modules/@revenge-mod/plugin-cli .cli
-node release.mjs
-```
+Ustawienia pluginu → wyszukaj kanał → wpisz folder (np. `Pictures/Funny`). Przycisk ⬇ w podglądzie zapisuje
+pliki z tego kanału (oraz jego wątków / postów na forum) do tego folderu. Ścieżka musi zaczynać się od
+`Pictures`, `DCIM`, `Download`, `Movies`, `Music` albo `Documents` (ograniczenie Androida).
+
+Zapis robi natywna część pluginu (`next/plugins/quick-save/src/main/kotlin`) przez MediaStore, bo zapis Discorda
+nie przyjmuje folderu, a `fs.write` Revenge zapisuje tylko tekst.
+
+### Wydawanie nowej wersji
+
+Edytuj `next/plugins/quick-save/`, podbij `version` w `manifest.json` i wypchnij. GitHub Actions
+(`.github/workflows/next.yml`) zbuduje JS + Kotlin i doda paczkę do `next/repo`. Gdy build się wywali,
+log trafia na gałąź `ci-log`.
 
 ## Instalacja (Revenge Classic, stary format)
 

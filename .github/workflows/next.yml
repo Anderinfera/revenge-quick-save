@@ -1,0 +1,89 @@
+# Builds the Revenge Next plugin (JS + native Kotlin) and publishes new versions to next/repo.
+#
+# The Revenge plugin API is normally fetched from GitHub Packages, which needs a personal access token.
+# Instead, it's built from the revenge-xposed sources and published to Maven Local, so no secrets are needed.
+#
+# A version is published only once: an existing next/repo/pool/<id>@<version>.zip is never replaced,
+# since Revenge refuses a republished version with a different checksum. Bump "version" in the manifest to release.
+# On failure, the build log is pushed to the `ci-log` branch so it can be read without signing in.
+
+name: Build Revenge Next plugin
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'next/**'
+      - '!next/repo/**'
+      - '.github/workflows/next.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: next-release
+  cancel-in-progress: false
+
+env:
+  REVENGE_API_TAG: api@1.1.0
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: oven-sh/setup-bun@v2
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 25
+
+      - name: Build Revenge API from source
+        run: |
+          set -o pipefail
+          git clone --depth 1 --branch "$REVENGE_API_TAG" https://github.com/revenge-mod/revenge-xposed "$RUNNER_TEMP/revenge-xposed"
+          cd "$RUNNER_TEMP/revenge-xposed"
+          ./gradlew --no-daemon :api:publishToMavenLocal 2>&1 | tee -a "$RUNNER_TEMP/ci.log"
+
+      - name: Build plugins
+        working-directory: next
+        run: |
+          set -o pipefail
+          ./gradlew --no-daemon packageAllPlugins 2>&1 | tee -a "$RUNNER_TEMP/ci.log"
+
+      - name: Publish new versions and regenerate the index
+        working-directory: next
+        run: |
+          set -o pipefail
+          mkdir -p repo/pool
+          for zip in build/dist/*.zip; do
+            name=$(basename "$zip")
+            if [ -e "repo/pool/$name" ]; then echo "Already published: $name"; else cp "$zip" "repo/pool/$name"; echo "New: $name"; fi
+          done
+          bun run generate-index --dist repo/pool \
+            --base-url "https://raw.githubusercontent.com/${{ github.repository }}/main/next/repo/pool" \
+            --out repo/index.json 2>&1 | tee -a "$RUNNER_TEMP/ci.log"
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add repo
+          if git diff --cached --quiet; then
+            echo "Nothing new to publish"
+          else
+            git commit -m "Publish Revenge Next plugin build"
+            git pull --rebase
+            git push
+          fi
+
+      - name: Push the build log to the ci-log branch
+        if: failure()
+        run: |
+          mkdir -p "$RUNNER_TEMP/log" && cd "$RUNNER_TEMP/log"
+          cp "$RUNNER_TEMP/ci.log" . 2>/dev/null || echo "No log captured" > ci.log
+          echo "${{ github.sha }} run ${{ github.run_id }}" > run.txt
+          git init -q -b ci-log
+          git add .
+          git -c user.name="github-actions[bot]" -c user.email="41898282+github-actions[bot]@users.noreply.github.com" commit -qm "CI log for ${{ github.sha }}"
+          git push -qf "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" ci-log
