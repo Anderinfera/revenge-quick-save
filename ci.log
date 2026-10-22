@@ -1,0 +1,101 @@
+Downloading https://services.gradle.org/distributions/gradle-9.6.1-bin.zip
+.............10%.............20%..............30%.............40%..............50%.............60%.............70%..............80%.............90%..............100%
+WARNING: A restricted method in java.lang.System has been called
+WARNING: java.lang.System::load has been called by net.rubygrapefruit.platform.internal.NativeLibraryLoader in an unnamed module (file:/home/runner/.gradle/wrapper/dists/gradle-9.6.1-bin/4ticwg1pgcbps2hj28r8so764/gradle-9.6.1/lib/native-platform-0.22-milestone-29.jar)
+WARNING: Use --enable-native-access=ALL-UNNAMED to avoid a warning for callers in this module
+WARNING: Restricted methods will be blocked in a future release unless native access is enabled
+
+
+Welcome to Gradle 9.6.1!
+
+Here are the highlights of this release:
+ - Improved Configuration Cache hit rates
+ - Additional CLI rendering options
+ - Important project hierarchy lookup deprecations
+
+For more details see https://docs.gradle.org/9.6.1/release-notes.html
+
+To honour the JVM settings for this build a single-use Daemon process will be forked. For more on this, please refer to https://docs.gradle.org/9.6.1/userguide/gradle_daemon.html#sec:disabling_the_daemon in the Gradle documentation.
+Daemon will be stopped at the end of the build 
+> Task :api:preBuild UP-TO-DATE
+> Task :api:preReleaseBuild UP-TO-DATE
+> Task :api:checkReleaseAarMetadata
+> Task :api:mergeReleaseJniLibFolders
+> Task :api:mergeReleaseNativeLibs NO-SOURCE
+> Task :api:stripReleaseDebugSymbols NO-SOURCE
+> Task :api:copyReleaseJniLibsProjectAndLocalJars
+> Task :api:extractDeepLinksForAarRelease
+> Task :api:generateReleaseBuildConfig
+> Task :api:generateReleaseResources
+> Task :api:packageReleaseResources
+> Task :api:processReleaseNavigationResources
+> Task :api:generateReleaseAssets UP-TO-DATE
+> Task :api:mergeReleaseAssets
+> Task :api:javaPreCompileRelease
+> Task :api:prepareLintJarForPublish
+> Task :api:prepareReleaseArtProfile
+> Task :api:writeReleaseAarMetadata
+> Task :api:parseReleaseLocalResources
+> Task :api:sourceReleaseJar
+> Task :api:generatePomFileForReleasePublication
+> Task :api:generateReleaseRFile
+> Task :api:processReleaseManifest
+> Task :api:extractReleaseAnnotations
+> Task :api:compileReleaseKotlin
+> Task :api:compileReleaseJavaWithJavac
+> Task :api:mergeReleaseGeneratedProguardFiles
+> Task :api:mergeReleaseConsumerProguardFiles
+> Task :api:processReleaseJavaRes
+> Task :api:mergeReleaseJavaResource
+> Task :api:syncReleaseLibJars
+> Task :api:bundleReleaseAar
+> Task :api:generateMetadataFileForReleasePublication
+> Task :api:publishReleasePublicationToMavenLocal
+> Task :api:publishToMavenLocal
+
+[Incubating] Problems report is available at: file:///home/runner/work/_temp/revenge-xposed/build/reports/problems/problems-report.html
+
+Deprecated Gradle features were used in this build, making it incompatible with Gradle 10.
+
+You can use '--warning-mode all' to show the individual deprecation warnings and determine if they come from your own scripts or plugins.
+
+For more on this, please refer to https://docs.gradle.org/9.6.1/userguide/command_line_interface.html#sec:command_line_warnings in the Gradle documentation.
+
+BUILD SUCCESSFUL in 1m 32s
+29 actionable tasks: 29 executed
+Consider enabling configuration cache to speed up this build: https://docs.gradle.org/9.6.1/userguide/configuration_cache_enabling.html
+WARNING: A restricted method in java.lang.System has been called
+WARNING: java.lang.System::load has been called by net.rubygrapefruit.platform.internal.NativeLibraryLoader in an unnamed module (file:/home/runner/.gradle/wrapper/dists/gradle-9.6.1-bin/4ticwg1pgcbps2hj28r8so764/gradle-9.6.1/lib/native-platform-0.22-milestone-29.jar)
+WARNING: Use --enable-native-access=ALL-UNNAMED to avoid a warning for callers in this module
+WARNING: Restricted methods will be blocked in a future release unless native access is enabled
+
+To honour the JVM settings for this build a single-use Daemon process will be forked. For more on this, please refer to https://docs.gradle.org/9.6.1/userguide/gradle_daemon.html#sec:disabling_the_daemon in the Gradle documentation.
+Daemon will be stopped at the end of the build 
+
+> Task :buildJs FAILED
+Building JS bundles with bun (/home/runner/.bun/bin/bun)
+error: prepare script from "@revenge-mod/plugin-cli" exited with 2
+note: devDependencies of a git dependency are not installed before its prepare scripts
+
+[Incubating] Problems report is available at: file:///home/runner/work/revenge-quick-save/revenge-quick-save/next/build/reports/problems/problems-report.html
+
+FAILURE: Build failed with an exception.
+
+* What went wrong:
+Execution failed for task ':buildJs' (registered in build file 'build.gradle.kts').
+> Process 'command '/home/runner/.bun/bin/bun'' finished with non-zero exit value 2
+
+* Try:
+> Run with --stacktrace option to get the stack trace.
+> Run with --info or --debug option to get more log output.
+> Run with --scan to get full insights from a Build Scan (powered by Develocity).
+> Get more help at https://help.gradle.org.
+
+Deprecated Gradle features were used in this build, making it incompatible with Gradle 10.
+
+You can use '--warning-mode all' to show the individual deprecation warnings and determine if they come from your own scripts or plugins.
+
+For more on this, please refer to https://docs.gradle.org/9.6.1/userguide/command_line_interface.html#sec:command_line_warnings in the Gradle documentation.
+
+BUILD FAILED in 30s
+1 actionable task: 1 executed
