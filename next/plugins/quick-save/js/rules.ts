@@ -47,6 +47,19 @@ export function describeChannel(id: string): { name: string; guild?: string } {
 	return { name: `#${channel.name ?? id}`, guild }
 }
 
+/**
+ * Channel ID from a pasted ID, attachment link (`/attachments/<channel>/<attachment>/...`)
+ * or message link (`discord.com/channels/<guild or @me>/<channel>/...`).
+ */
+export function parseChannelId(input: string): string | undefined {
+	const text = input.trim()
+	if (/^\d{17,20}$/.test(text)) return text
+	return (
+		text.match(/\/attachments\/(\d{17,20})\//)?.[1] ??
+		text.match(/discord(?:app)?\.com\/channels\/(?:@me|\d{17,20})\/(\d{17,20})/)?.[1]
+	)
+}
+
 // Text, announcement, forum and media channels: the ones images get posted in.
 const POSTABLE_TYPES = new Set([0, 5, 15, 16])
 

@@ -2,7 +2,7 @@ import Page from '@revenge-mod/components/Page'
 import { Design } from '@revenge-mod/discord/design'
 import { useMemo, useState } from 'react'
 import { ScrollView } from 'react-native'
-import { describeChannel, listChannels, pathError } from './rules'
+import { describeChannel, getChannel, listChannels, parseChannelId, pathError } from './rules'
 import type { PluginSettingsComponent } from '@revenge-mod/plugins/types'
 import type { ComponentProps } from 'react'
 import type { Rule, Settings } from './rules'
@@ -19,7 +19,8 @@ export default function SettingsComponent({ api: { jsonStorage } }: Props) {
 	const setRules = (next: Rule[]) => jsonStorage.set({ rules: next })
 
 	const [query, setQuery] = useState('')
-	const searching = query.trim().length > 0
+	const pastedId = parseChannelId(query)
+	const searching = query.trim().length > 0 && !pastedId
 	// Listing every channel is the expensive part, so only do it once per search session.
 	const channels = useMemo(() => (searching ? listChannels() : []), [searching])
 	const results = useMemo(() => {
@@ -30,12 +31,20 @@ export default function SettingsComponent({ api: { jsonStorage } }: Props) {
 			.slice(0, MAX_RESULTS)
 	}, [channels, query, rules])
 
+	const addRule = (channelId: string, name?: string) => {
+		setRules([...rules, { channelId, path: `Pictures/${name ?? 'Discord'}` }])
+		setQuery('')
+	}
+	const pastedChannel = pastedId ? getChannel(pastedId) : undefined
+	const pastedTaken = pastedId ? rules.some(r => r.channelId === pastedId) : false
+
 	return (
 		<ScrollView keyboardShouldPersistTaps="handled">
 			<Page>
 				<Text variant="text-sm/medium" color="text-muted">
 					Przycisk pobierania w podglądzie zapisuje pliki z tych kanałów do wybranego folderu (wątki i posty na
-					forum też się liczą). Ścieżka musi zaczynać się od Pictures, DCIM, Download, Movies, Music albo
+					forum też się liczą). Kanał możesz wyszukać po nazwie albo wkleić jego ID, link do wiadomości lub link
+					do załącznika z tego kanału. Ścieżka musi zaczynać się od Pictures, DCIM, Download, Movies, Music albo
 					Documents, np. Pictures/Funny. Pozostałe kanały zapisują się jak zwykle.
 				</Text>
 
@@ -59,11 +68,26 @@ export default function SettingsComponent({ api: { jsonStorage } }: Props) {
 				<Stack>
 					<TextInput
 						label="Dodaj kanał"
-						placeholder="Szukaj po nazwie kanału lub serwera"
+						placeholder="Nazwa kanału, ID albo link do załącznika"
 						value={query}
 						onChange={setQuery}
 						isClearable
 					/>
+					{pastedId && (
+						<TableRowGroup title="Kanał z ID">
+							<TableRow
+								label={pastedChannel ? describeChannel(pastedId).name : `Kanał ${pastedId}`}
+								subLabel={
+									pastedTaken
+										? 'Ten kanał jest już na liście'
+										: (describeChannel(pastedId).guild ??
+											(pastedChannel ? undefined : 'Nie znam tego kanału, ale reguła i tak zadziała'))
+								}
+								arrow={!pastedTaken}
+								onPress={pastedTaken ? undefined : () => addRule(pastedId, pastedChannel?.name)}
+							/>
+						</TableRowGroup>
+					)}
 					{searching && (
 						<TableRowGroup title={results.length ? 'Wyniki' : 'Brak wyników'}>
 							{results.map(channel => (
@@ -72,10 +96,7 @@ export default function SettingsComponent({ api: { jsonStorage } }: Props) {
 									label={`#${channel.name}`}
 									subLabel={channel.guild}
 									arrow
-									onPress={() => {
-										setRules([...rules, { channelId: channel.id, path: `Pictures/${channel.name}` }])
-										setQuery('')
-									}}
+									onPress={() => addRule(channel.id, channel.name)}
 								/>
 							))}
 						</TableRowGroup>
