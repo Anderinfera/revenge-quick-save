@@ -13,13 +13,11 @@ import { withProps } from '@revenge-mod/modules/finders/filters'
 import { callNativeMethod } from '@revenge-mod/modules/native'
 import { instead } from '@revenge-mod/patcher'
 import { lookupGeneratedIconComponent } from '@revenge-mod/utils/discord'
-import { fileNameOf, findRule, fullResUrl } from './rules'
+import { fileNameOf, findRule, fullResUrl, SAVE_TO_METHOD } from './rules'
 import SettingsComponent from './settings'
 import type { Settings } from './rules'
 
 type Node = any
-
-const SAVE_TO_METHOD = 'anderinfera.quick-save.saveTo'
 
 function findInTree(tree: Node, filter: (n: Node) => boolean): Node {
 	const stack = [tree]

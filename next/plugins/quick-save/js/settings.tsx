@@ -1,8 +1,16 @@
 import Page from '@revenge-mod/components/Page'
 import { Design } from '@revenge-mod/discord/design'
-import { useMemo, useState } from 'react'
+import { callNativeMethod } from '@revenge-mod/modules/native'
+import { useEffect, useMemo, useState } from 'react'
 import { ScrollView } from 'react-native'
-import { describeChannel, getChannel, listChannels, parseChannelId, pathError } from './rules'
+import {
+	CAN_WRITE_ANYWHERE_METHOD,
+	describeChannel,
+	getChannel,
+	listChannels,
+	parseChannelId,
+	pathError,
+} from './rules'
 import type { PluginSettingsComponent } from '@revenge-mod/plugins/types'
 import type { ComponentProps } from 'react'
 import type { Rule, Settings } from './rules'
@@ -17,6 +25,14 @@ export default function SettingsComponent({ api: { jsonStorage } }: Props) {
 	const rules = jsonStorage.use()?.rules ?? []
 	// Arrays aren't deep-merged by jsonStorage.set, so this replaces the whole list.
 	const setRules = (next: Rule[]) => jsonStorage.set({ rules: next })
+
+	// Whether Discord has All files access (asked from the native side; false if it isn't loaded).
+	const [anywhere, setAnywhere] = useState(false)
+	useEffect(() => {
+		;(callNativeMethod as any)(CAN_WRITE_ANYWHERE_METHOD, [])
+			.then((value: unknown) => setAnywhere(value === true))
+			.catch(() => {})
+	}, [])
 
 	const [query, setQuery] = useState('')
 	const pastedId = parseChannelId(query)
@@ -44,8 +60,12 @@ export default function SettingsComponent({ api: { jsonStorage } }: Props) {
 				<Text variant="text-sm/medium" color="text-muted">
 					Przycisk pobierania w podglądzie zapisuje pliki z tych kanałów do wybranego folderu (wątki i posty na
 					forum też się liczą). Kanał możesz wyszukać po nazwie albo wkleić jego ID, link do wiadomości lub link
-					do załącznika z tego kanału. Ścieżka musi zaczynać się od Pictures, DCIM, Download, Movies, Music albo
-					Documents, np. Pictures/Funny. Pozostałe kanały zapisują się jak zwykle.
+					do załącznika z tego kanału. Pozostałe kanały zapisują się jak zwykle.
+				</Text>
+				<Text variant="text-sm/medium" color="text-muted">
+					{anywhere
+						? 'Discord ma dostęp do wszystkich plików, więc folder może być dowolny, np. Memy/Funny (od głównego katalogu pamięci) albo /storage/emulated/0/Memy.'
+						: 'Bez dostępu do wszystkich plików ścieżka musi zaczynać się od Pictures, DCIM, Download, Movies, Music albo Documents, np. Pictures/Funny. Żeby zapisywać gdziekolwiek, włącz Discordowi „Dostęp do wszystkich plików” w ustawieniach Androida i otwórz ten ekran ponownie.'}
 				</Text>
 
 				<TableRowGroup title="Kanały i foldery">
@@ -54,6 +74,7 @@ export default function SettingsComponent({ api: { jsonStorage } }: Props) {
 							<RuleCard
 								key={rule.channelId}
 								rule={rule}
+								anywhere={anywhere}
 								onPathChange={path =>
 									setRules(rules.map(r => (r.channelId === rule.channelId ? { ...r, path } : r)))
 								}
@@ -109,15 +130,19 @@ export default function SettingsComponent({ api: { jsonStorage } }: Props) {
 
 function RuleCard({
 	rule,
+	anywhere,
 	onPathChange,
 	onRemove,
 }: {
 	rule: Rule
+	anywhere: boolean
 	onPathChange: (path: string) => void
 	onRemove: () => void
 }) {
 	const { name, guild } = describeChannel(rule.channelId)
-	const [error, setError] = useState(pathError(rule.path))
+	const [value, setValue] = useState(rule.path)
+	// Derived, so it updates once the permission check comes back.
+	const error = pathError(value, anywhere)
 
 	return (
 		<Card>
@@ -129,10 +154,9 @@ function RuleCard({
 					defaultValue={rule.path}
 					status={error ? 'error' : 'default'}
 					errorMessage={error}
-					onChange={(value: string) => {
-						const err = pathError(value)
-						setError(err)
-						if (!err) onPathChange(value.trim())
+					onChange={(next: string) => {
+						setValue(next)
+						if (!pathError(next, anywhere)) onPathChange(next.trim())
 					}}
 				/>
 				<Button variant="destructive" size="sm" text="Usuń" onPress={onRemove} />

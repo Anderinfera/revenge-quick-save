@@ -2,8 +2,10 @@
 
 package anderinfera.quicksave
 
+import android.Manifest
 import android.content.ContentValues
 import android.content.Context
+import android.content.pm.PackageManager
 import android.media.MediaScannerConnection
 import android.net.Uri
 import android.os.Build
@@ -14,21 +16,29 @@ import android.provider.MediaStore
 import android.widget.Toast
 import io.github.revenge.plugins.plugin
 import io.github.revenge.xposed.api.registerNativeAsyncMethod
+import io.github.revenge.xposed.api.registerNativeMethod
 import java.io.File
 import java.io.InputStream
 import java.net.HttpURLConnection
 import java.net.URL
 
 /**
- * Native half of QuickSave: downloads a file and saves it into a user-chosen public folder (e.g. `Pictures/Funny`).
+ * Native half of QuickSave: downloads a file and saves it into a user-chosen folder.
  *
  * JS calls `<plugin id>.saveTo(url, folder, fileName, mimeType?)` when the viewed media's channel has a folder rule.
  * Discord's own Save can't take a destination, and Revenge's `fs.write` only writes text, hence this.
+ *
+ * - With "All files access" granted to Discord: any folder, written directly (`Memy/Funny`, `/storage/emulated/0/Memy`).
+ * - Without it: only public folders (`Pictures/...`, `Download/...`, ...) through MediaStore, which needs no permission.
+ *
+ * `<plugin id>.canWriteAnywhere()` tells the settings screen which of the two applies.
  */
 @Suppress("UNUSED")
 val quickSave = plugin {
     start {
         withAppContext { ctx ->
+            registerNativeMethod("${manifest.id}.canWriteAnywhere") { hasAllFilesAccess(ctx) }
+
             // Async: runs off the React native-modules thread, so blocking network/disk IO is fine here.
             registerNativeAsyncMethod("${manifest.id}.saveTo") { args ->
                 val url = args.getOrNull(0) as? String ?: throw IllegalArgumentException("Missing url")
@@ -37,7 +47,7 @@ val quickSave = plugin {
                 val mimeHint = args.getOrNull(3) as? String
 
                 try {
-                    val saved = saveTo(ctx, url, normalizeFolder(folder), fileName, mimeHint)
+                    val saved = saveTo(ctx, url, folder, fileName, mimeHint)
                     toast(ctx, "Zapisano: $saved")
                     saved
                 } catch (e: Throwable) {
@@ -86,8 +96,32 @@ private fun open(url: String): HttpURLConnection =
         if (responseCode !in 200..299) throw IllegalStateException("HTTP $responseCode")
     }
 
-/** @return The saved file's path relative to shared storage, e.g. `Pictures/Funny/cat.png`. */
+/** Discord holds MANAGE_EXTERNAL_STORAGE ("All files access") on Android 11+, or the legacy write permission before. */
+internal fun hasAllFilesAccess(ctx: Context): Boolean =
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) Environment.isExternalStorageManager()
+    else ctx.checkSelfPermission(Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED
+
+/** `Memy/Funny` (from the storage root), `/sdcard/Memy` or `/storage/emulated/0/Memy` -> the absolute directory. */
+@Suppress("DEPRECATION")
+internal fun resolveAnyFolder(input: String): File {
+    val path = input.trim().replace('\\', '/')
+    require(path.isNotEmpty() && path != "/") { "Pusta ścieżka" }
+    require(path.split('/').none { it == ".." }) { "Ścieżka nie może zawierać '..'" }
+
+    val root = Environment.getExternalStorageDirectory()
+    return when {
+        path.startsWith("/storage/") -> File(path)
+        path == "/sdcard" || path.startsWith("/sdcard/") -> File(root, path.removePrefix("/sdcard"))
+        else -> File(root, path.trimStart('/'))
+    }
+}
+
+/** @return Where the file was saved, relative to the storage root when inside it, e.g. `Pictures/Funny/cat.png`. */
 private fun saveTo(ctx: Context, url: String, folder: String, fileName: String, mimeHint: String?): String {
+    // Validate before downloading anything.
+    val anyDir = if (hasAllFilesAccess(ctx)) resolveAnyFolder(folder) else null
+    val publicFolder = if (anyDir == null) normalizeFolder(folder) else null
+
     val conn = open(url)
     try {
         val mime = mimeHint?.takeIf { '/' in it }
@@ -95,8 +129,11 @@ private fun saveTo(ctx: Context, url: String, folder: String, fileName: String, 
             ?: "application/octet-stream"
 
         return conn.inputStream.use { input ->
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) saveWithMediaStore(ctx, input, folder, fileName, mime)
-            else saveLegacy(ctx, input, folder, fileName, mime)
+            when {
+                anyDir != null -> saveToDirectory(ctx, input, anyDir, fileName, mime)
+                Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q -> saveWithMediaStore(ctx, input, publicFolder!!, fileName, mime)
+                else -> saveToDirectory(ctx, input, resolveAnyFolder(publicFolder!!), fileName, mime)
+            }
         }
     } finally {
         conn.disconnect()
@@ -141,10 +178,10 @@ private fun saveWithMediaStore(ctx: Context, input: InputStream, folder: String,
     return "$folder/$finalName"
 }
 
-/** Android 7-9: plain file write (Discord holds the legacy storage permission there), then index it. */
+/** Plain file write (needs All files access, or the legacy permission on Android 7-9), then index it for the gallery. */
 @Suppress("DEPRECATION")
-private fun saveLegacy(ctx: Context, input: InputStream, folder: String, fileName: String, mime: String): String {
-    val dir = File(Environment.getExternalStorageDirectory(), folder).apply { mkdirs() }
+private fun saveToDirectory(ctx: Context, input: InputStream, dir: File, fileName: String, mime: String): String {
+    if (!dir.isDirectory && !dir.mkdirs()) throw IllegalStateException("Nie można utworzyć folderu ${dir.absolutePath}")
     var file = File(dir, fileName)
     var n = 1
     while (file.exists()) file = File(dir, "${fileName.substringBeforeLast('.')} (${n++})" +
@@ -152,7 +189,9 @@ private fun saveLegacy(ctx: Context, input: InputStream, folder: String, fileNam
 
     file.outputStream().use { input.copyTo(it) }
     MediaScannerConnection.scanFile(ctx, arrayOf(file.absolutePath), arrayOf(mime), null)
-    return "$folder/${file.name}"
+
+    val root = Environment.getExternalStorageDirectory().absolutePath + "/"
+    return file.absolutePath.removePrefix(root)
 }
 
 private fun toast(ctx: Context, text: String) {

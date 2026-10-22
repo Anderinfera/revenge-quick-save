@@ -1,8 +1,12 @@
 import { Stores } from '@revenge-mod/discord/flux'
 
+// Native methods registered by QuickSave.kt.
+export const SAVE_TO_METHOD = 'anderinfera.quick-save.saveTo'
+export const CAN_WRITE_ANYWHERE_METHOD = 'anderinfera.quick-save.canWriteAnywhere'
+
 export interface Rule {
 	channelId: string
-	/** Public folder, e.g. `Pictures/Funny`. Normalized and validated again on the native side. */
+	/** e.g. `Pictures/Funny`, or any folder with All files access. Validated again on the native side. */
 	path: string
 }
 
@@ -12,8 +16,11 @@ export interface Settings {
 
 const PUBLIC_DIRS = ['Pictures', 'DCIM', 'Download', 'Movies', 'Music', 'Documents']
 
-/** Mirror of the native check, so the settings screen can show the error while typing. */
-export function pathError(path: string): string | undefined {
+/**
+ * Mirror of the native check, so the settings screen can show the error while typing.
+ * @param anywhere Discord has All files access, so any folder is allowed.
+ */
+export function pathError(path: string, anywhere = false): string | undefined {
 	const parts = path
 		.trim()
 		.replace(/\\/g, '/')
@@ -22,6 +29,7 @@ export function pathError(path: string): string | undefined {
 		.filter(p => p && p !== '.')
 	if (!parts.length) return 'Wpisz ścieżkę, np. Pictures/Funny'
 	if (parts.includes('..')) return "Ścieżka nie może zawierać '..'"
+	if (anywhere) return
 	const first = /^downloads$/i.test(parts[0]!) ? 'Download' : parts[0]!
 	if (!PUBLIC_DIRS.some(d => d.toLowerCase() === first.toLowerCase()))
 		return `Ścieżka musi zaczynać się od: ${PUBLIC_DIRS.join(', ')}`
