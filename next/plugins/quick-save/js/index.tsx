@@ -12,6 +12,7 @@ import { getModules, lookupModule } from '@revenge-mod/modules/finders'
 import { withProps } from '@revenge-mod/modules/finders/filters'
 import { callNativeMethod } from '@revenge-mod/modules/native'
 import { instead } from '@revenge-mod/patcher'
+import { lookupGeneratedIconComponent } from '@revenge-mod/utils/discord'
 import { fileNameOf, findRule, fullResUrl } from './rules'
 import SettingsComponent from './settings'
 import type { Settings } from './rules'
@@ -35,7 +36,10 @@ const isMenu = (n: Node) => Array.isArray(n?.props?.items) && typeof n.props.chi
 const isHeaderButton = (n: Node) =>
 	n?.props && 'icon' in n.props && 'onPress' in n.props && 'accessibilityLabel' in n.props
 
-const icon = (name: string) => (lookupModule(withProps(name)) as any)[0]?.[name]
+// Icon modules are lazy: withProps only sees initialized ones, while the generated-icon lookup also
+// finds (and initializes) icons nothing has rendered yet.
+const icon = (name: string): any =>
+	lookupGeneratedIconComponent(name) ?? (lookupModule(withProps(name)) as any)[0]?.[name]
 
 function findSaveItem(items: Node[]) {
 	const DownloadIcon = icon('DownloadIcon')
@@ -78,8 +82,10 @@ export default plugin<{ jsonStorage: Settings }>({
 			const menuIndex = kids.findIndex(isMenu)
 			const added: Node[] = []
 
+			const items: Node[] = kids[menuIndex].props.items
 			const url = source?.shareURI || source?.sourceURI || source?.uri
-			const LinkIcon = icon('LinkIcon')
+			// Never drop the button over a missing icon: fall back to the menu's own Share / Open in Browser icons.
+			const LinkIcon = icon('LinkIcon') ?? items[2]?.IconComponent ?? items[items.length - 1]?.IconComponent
 			if (url && LinkIcon) {
 				added.push(
 					createElement(button.type, {
@@ -91,7 +97,7 @@ export default plugin<{ jsonStorage: Settings }>({
 				)
 			}
 
-			const saveItem = findSaveItem(kids[menuIndex].props.items)
+			const saveItem = findSaveItem(items)
 			if (saveItem) {
 				added.push(
 					createElement(button.type, {
