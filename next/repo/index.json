@@ -5,17 +5,30 @@
   "plugins": {
     "anderinfera.quick-save": {
       "name": "QuickSave",
-      "description": "Adds Copy link and Save buttons to the image viewer header, next to the menu button.",
+      "description": "Copy link and Save buttons in the image viewer header. Saves files from chosen channels into chosen folders.",
       "author": "Anderinfera",
       "icon": "DownloadIcon",
       "channels": {
-        "latest": "1.0.0"
+        "latest": "1.1.0"
       },
       "versions": {
         "1.0.0": {
           "url": "https://raw.githubusercontent.com/Anderinfera/revenge-quick-save/main/next/repo/pool/anderinfera.quick-save@1.0.0.zip",
           "sha256": "974dab38e115324137ac51805661605aa32f98a47b6572a85b81173067fa2172",
           "size": 1295,
+          "dependencies": {
+            "revenge.api": {
+              "version": ">=1 <2"
+            },
+            "discord": {
+              "version": "*"
+            }
+          }
+        },
+        "1.1.0": {
+          "url": "https://raw.githubusercontent.com/Anderinfera/revenge-quick-save/main/next/repo/pool/anderinfera.quick-save@1.1.0.zip",
+          "sha256": "fcd3c7c40f6dc6e041afcc8aaf6829c1398d137b4a4d47024a98ee27d5c375b6",
+          "size": 13050,
           "dependencies": {
             "revenge.api": {
               "version": ">=1 <2"
