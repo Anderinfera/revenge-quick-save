@@ -1,0 +1,20 @@
+{
+	"format": 1,
+	"id": "anderinfera.quick-save",
+	"name": "QuickSave",
+	"description": "Adds Copy link and Save buttons to the image viewer header, next to the menu button.",
+	"author": "Anderinfera",
+	"version": "1.0.0",
+	"icon": "DownloadIcon",
+	"dependencies": {
+		"revenge.api": {
+			"version": ">=1 <2"
+		},
+		"discord": {
+			"version": "*"
+		}
+	},
+	"dist": {
+		"script": "index.js"
+	}
+}

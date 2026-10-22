@@ -4,7 +4,26 @@ Dodaje w nagłówku podglądu obrazka (obok menu „…”) dwa przyciski: **Kop
 Zamiast: kliknij obrazek → menu → Save, robisz: kliknij obrazek → Save.
 Używa wbudowanej akcji Save Discorda, więc zapisuje oryginał w pełnej rozdzielczości.
 
-## Instalacja
+## Instalacja (Revenge Next)
+
+Settings → Revenge → Plugins → ikona zębatki → dodaj repozytorium:
+
+```
+https://raw.githubusercontent.com/Anderinfera/revenge-quick-save/main/next/repo/index.json
+```
+
+Potem Plugins → `+` (Browse Plugins) → QuickSave → Install.
+
+Zmiany: edytuj `next/plugins/quick-save/js/index.ts` i podbij `version` w `next/plugins/quick-save/manifest.json`, potem:
+
+```
+cd next
+npm i --ignore-scripts --legacy-peer-deps
+cp -r node_modules/@revenge-mod/plugin-cli .cli
+node release.mjs
+```
+
+## Instalacja (Revenge Classic, stary format)
 
 Revenge → Settings → Plugins → `+` → wklej URL:
 
