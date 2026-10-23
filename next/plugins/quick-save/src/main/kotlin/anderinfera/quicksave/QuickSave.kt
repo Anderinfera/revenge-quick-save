@@ -47,9 +47,8 @@ val quickSave = plugin {
                 val mimeHint = args.getOrNull(3) as? String
 
                 try {
-                    val saved = saveTo(ctx, url, folder, fileName, mimeHint)
-                    toast(ctx, "Zapisano: $saved")
-                    saved
+                    // No toast on success on purpose; errors still show one.
+                    saveTo(ctx, url, folder, fileName, mimeHint)
                 } catch (e: Throwable) {
                     log.e("Save to '$folder' failed", e)
                     toast(ctx, "Nie udało się zapisać: ${e.message}")
