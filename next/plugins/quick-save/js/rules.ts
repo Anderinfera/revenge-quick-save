@@ -17,14 +17,25 @@ export interface Settings {
 const PUBLIC_DIRS = ['Pictures', 'DCIM', 'Download', 'Movies', 'Music', 'Documents']
 
 /**
+ * Same as `canonicalPath` in QuickSave.kt: missing leading slash, backslashes and aliases are tolerated, so
+ * `storage/emulated/0/DCIM/Camera` and `/sdcard/DCIM/Camera` become `/storage/emulated/0/DCIM/Camera`.
+ */
+export function canonicalPath(input: string): string {
+	let path = input.trim().replace(/\\/g, '/').replace(/\/{2,}/g, '/').replace(/\/+$/, '')
+	if (/^\/?(storage|sdcard|mnt\/sdcard)(\/|$)/i.test(path)) path = `/${path.replace(/^\/+/, '')}`
+	return path.replace(
+		/^\/(storage\/emulated\/0|storage\/self\/primary|sdcard|mnt\/sdcard)(?=\/|$)/i,
+		'/storage/emulated/0',
+	)
+}
+
+/**
  * Mirror of the native check, so the settings screen can show the error while typing.
  * @param anywhere Discord has All files access, so any folder is allowed.
  */
 export function pathError(path: string, anywhere = false): string | undefined {
-	const parts = path
-		.trim()
-		.replace(/\\/g, '/')
-		.replace(/^\/storage\/emulated\/0|^\/sdcard/, '')
+	const parts = canonicalPath(path)
+		.replace(/^\/storage\/emulated\/0(?=\/|$)/, '')
 		.split('/')
 		.filter(p => p && p !== '.')
 	if (!parts.length) return 'Wpisz ścieżkę, np. Pictures/Funny'

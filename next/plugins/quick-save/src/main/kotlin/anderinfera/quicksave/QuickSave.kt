@@ -68,11 +68,26 @@ private val PUBLIC_DIRS = listOf(
     Environment.DIRECTORY_DOCUMENTS,
 )
 
-/** `/storage/emulated/0/Pictures/Funny/` or `pictures/Funny` -> `Pictures/Funny`. Only public top-level folders are allowed. */
+private const val INTERNAL_ROOT = "/storage/emulated/0"
+
+private val ABSOLUTE_START = Regex("^/?(storage|sdcard|mnt/sdcard)(/|$)", RegexOption.IGNORE_CASE)
+private val INTERNAL_ALIASES =
+    Regex("^/(storage/emulated/0|storage/self/primary|sdcard|mnt/sdcard)(?=/|$)", RegexOption.IGNORE_CASE)
+
+/**
+ * Tolerates however a full path gets typed: missing leading slash, backslashes, doubled slashes, any letter case
+ * of the internal-storage prefix, and its aliases. `storage/emulated/0/DCIM/Camera`, `/sdcard/DCIM/Camera` and
+ * `/storage/self/primary/DCIM/Camera` all become `/storage/emulated/0/DCIM/Camera`. Relative paths stay relative.
+ */
+internal fun canonicalPath(input: String): String {
+    var path = input.trim().replace('\\', '/').replace(Regex("/{2,}"), "/").trimEnd('/')
+    if (ABSOLUTE_START.containsMatchIn(path)) path = "/" + path.trimStart('/')
+    return path.replace(INTERNAL_ALIASES, INTERNAL_ROOT)
+}
+
+/** `storage/emulated/0/Pictures/Funny/` or `pictures/Funny` -> `Pictures/Funny`. Only public top-level folders are allowed. */
 internal fun normalizeFolder(input: String): String {
-    val path = input.trim().replace('\\', '/')
-        .removePrefix("/storage/emulated/0")
-        .removePrefix("/sdcard")
+    val path = canonicalPath(input).removePrefix(INTERNAL_ROOT)
     val parts = path.split('/').filter { it.isNotBlank() && it != "." }
     require(parts.isNotEmpty()) { "Pusta ścieżka" }
     require(parts.none { it == ".." }) { "Ścieżka nie może zawierać '..'" }
@@ -103,14 +118,15 @@ internal fun hasAllFilesAccess(ctx: Context): Boolean =
 /** `Memy/Funny` (from the storage root), `/sdcard/Memy` or `/storage/emulated/0/Memy` -> the absolute directory. */
 @Suppress("DEPRECATION")
 internal fun resolveAnyFolder(input: String): File {
-    val path = input.trim().replace('\\', '/')
-    require(path.isNotEmpty() && path != "/") { "Pusta ścieżka" }
+    val path = canonicalPath(input)
+    require(path.isNotEmpty() && path != "/" && path != INTERNAL_ROOT) { "Pusta ścieżka" }
     require(path.split('/').none { it == ".." }) { "Ścieżka nie może zawierać '..'" }
 
     val root = Environment.getExternalStorageDirectory()
     return when {
-        path.startsWith("/storage/") -> File(path)
-        path == "/sdcard" || path.startsWith("/sdcard/") -> File(root, path.removePrefix("/sdcard"))
+        // Internal storage via the API's root, in case it isn't literally /storage/emulated/0 on this device.
+        path.startsWith("$INTERNAL_ROOT/") -> File(root, path.removePrefix("$INTERNAL_ROOT/"))
+        path.startsWith("/storage/") -> File(path) // e.g. an SD card: /storage/1234-5678/...
         else -> File(root, path.trimStart('/'))
     }
 }
