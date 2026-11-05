@@ -3,6 +3,7 @@ import { Stores } from '@revenge-mod/discord/flux'
 // Native methods registered by QuickSave.kt.
 export const SAVE_TO_METHOD = 'anderinfera.quick-save.saveTo'
 export const CAN_WRITE_ANYWHERE_METHOD = 'anderinfera.quick-save.canWriteAnywhere'
+export const HAPTIC_METHOD = 'anderinfera.quick-save.haptic'
 
 export interface Rule {
 	channelId: string

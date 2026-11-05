@@ -3,6 +3,7 @@
 package anderinfera.quicksave
 
 import android.Manifest
+import android.app.Activity
 import android.content.ContentValues
 import android.content.Context
 import android.content.pm.PackageManager
@@ -13,12 +14,14 @@ import android.os.Environment
 import android.os.Handler
 import android.os.Looper
 import android.provider.MediaStore
+import android.view.HapticFeedbackConstants
 import android.widget.Toast
 import io.github.revenge.plugins.plugin
 import io.github.revenge.xposed.api.registerNativeAsyncMethod
 import io.github.revenge.xposed.api.registerNativeMethod
 import java.io.File
 import java.io.InputStream
+import java.lang.ref.WeakReference
 import java.net.HttpURLConnection
 import java.net.URL
 
@@ -32,10 +35,15 @@ import java.net.URL
  * - Without it: only public folders (`Pictures/...`, `Download/...`, ...) through MediaStore, which needs no permission.
  *
  * `<plugin id>.canWriteAnywhere()` tells the settings screen which of the two applies.
+ * `<plugin id>.haptic()` gives a short haptic tick as feedback for the header buttons.
  */
 @Suppress("UNUSED")
 val quickSave = plugin {
     start {
+        var activity = WeakReference<Activity>(null)
+        withAppActivity { activity = WeakReference(it) }
+        registerNativeMethod("${manifest.id}.haptic") { haptic(activity.get()); null }
+
         withAppContext { ctx ->
             registerNativeMethod("${manifest.id}.canWriteAnywhere") { hasAllFilesAccess(ctx) }
 
@@ -207,6 +215,14 @@ private fun saveToDirectory(ctx: Context, input: InputStream, dir: File, fileNam
 
     val root = Environment.getExternalStorageDirectory().absolutePath + "/"
     return file.absolutePath.removePrefix(root)
+}
+
+/** Same feedback Android uses for a confirmed tap. Follows the system touch-feedback setting, needs no permission. */
+private fun haptic(activity: Activity?) {
+    val view = activity?.window?.decorView ?: return
+    val effect = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) HapticFeedbackConstants.CONFIRM
+    else HapticFeedbackConstants.VIRTUAL_KEY
+    view.post { view.performHapticFeedback(effect) }
 }
 
 private fun toast(ctx: Context, text: String) {

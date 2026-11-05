@@ -13,7 +13,7 @@ import { withProps } from '@revenge-mod/modules/finders/filters'
 import { callNativeMethod } from '@revenge-mod/modules/native'
 import { instead } from '@revenge-mod/patcher'
 import { lookupGeneratedIconComponent } from '@revenge-mod/utils/discord'
-import { fileNameOf, findRule, fullResUrl, SAVE_TO_METHOD } from './rules'
+import { fileNameOf, findRule, fullResUrl, HAPTIC_METHOD, SAVE_TO_METHOD } from './rules'
 import SettingsComponent from './settings'
 import type { Settings } from './rules'
 
@@ -46,6 +46,9 @@ function findSaveItem(items: Node[]) {
 		items.find(it => /^(save|zapisz)/i.test(it?.label ?? ''))
 	)
 }
+
+// Haptic tick as the only feedback for a press (no toasts). Silently skipped if the native half isn't loaded.
+const haptic = () => (callNativeMethod as any)(HAPTIC_METHOD, []).catch(() => {})
 
 export default plugin<{ jsonStorage: Settings }>({
 	jsonStorage: {
@@ -89,7 +92,10 @@ export default plugin<{ jsonStorage: Settings }>({
 					createElement(button.type, {
 						key: 'quicksave-copy',
 						accessibilityLabel: 'Copy Link',
-						onPress: () => Clipboard.setString(url),
+						onPress: () => {
+							haptic()
+							Clipboard.setString(url)
+						},
 						icon: iconEl(LinkIcon),
 					}),
 				)
@@ -101,7 +107,10 @@ export default plugin<{ jsonStorage: Settings }>({
 					createElement(button.type, {
 						key: 'quicksave',
 						accessibilityLabel: saveItem.label,
-						onPress: () => save(source, saveItem.action),
+						onPress: () => {
+							haptic()
+							save(source, saveItem.action)
+						},
 						icon: iconEl(saveItem.IconComponent),
 					}),
 				)
