@@ -47,8 +47,8 @@ function findSaveItem(items: Node[]) {
 	)
 }
 
-// Haptic tick as the only feedback for a press (no toasts). Silently skipped if the native half isn't loaded.
-const haptic = () => (callNativeMethod as any)(HAPTIC_METHOD, []).catch(() => {})
+// Haptics as the only feedback for a press (no toasts): 1 pulse = copy, 2 pulses = save. Skipped if the native half isn't loaded.
+const haptic = (pulses: number) => (callNativeMethod as any)(HAPTIC_METHOD, [pulses]).catch(() => {})
 
 export default plugin<{ jsonStorage: Settings }>({
 	jsonStorage: {
@@ -93,7 +93,7 @@ export default plugin<{ jsonStorage: Settings }>({
 						key: 'quicksave-copy',
 						accessibilityLabel: 'Copy Link',
 						onPress: () => {
-							haptic()
+							haptic(1)
 							Clipboard.setString(url)
 						},
 						icon: iconEl(LinkIcon),
@@ -108,7 +108,7 @@ export default plugin<{ jsonStorage: Settings }>({
 						key: 'quicksave',
 						accessibilityLabel: saveItem.label,
 						onPress: () => {
-							haptic()
+							haptic(2)
 							save(source, saveItem.action)
 						},
 						icon: iconEl(saveItem.IconComponent),

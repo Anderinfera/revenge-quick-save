@@ -42,7 +42,11 @@ val quickSave = plugin {
     start {
         var activity = WeakReference<Activity>(null)
         withAppActivity { activity = WeakReference(it) }
-        registerNativeMethod("${manifest.id}.haptic") { haptic(activity.get()); null }
+        registerNativeMethod("${manifest.id}.haptic") { args ->
+            val pulses = ((args.getOrNull(0) as? Number)?.toInt() ?: 1).coerceIn(1, 3)
+            haptic(activity.get(), pulses)
+            null
+        }
 
         withAppContext { ctx ->
             registerNativeMethod("${manifest.id}.canWriteAnywhere") { hasAllFilesAccess(ctx) }
@@ -217,12 +221,18 @@ private fun saveToDirectory(ctx: Context, input: InputStream, dir: File, fileNam
     return file.absolutePath.removePrefix(root)
 }
 
-/** Same feedback Android uses for a confirmed tap. Follows the system touch-feedback setting, needs no permission. */
-private fun haptic(activity: Activity?) {
+private const val PULSE_GAP_MS = 140L
+
+/**
+ * [pulses] short taps ([PULSE_GAP_MS] apart): 1 for Copy link, 2 for Save.
+ * Uses the system tap feedback, so it follows the touch-feedback setting and needs no permission.
+ */
+private fun haptic(activity: Activity?, pulses: Int) {
     val view = activity?.window?.decorView ?: return
-    val effect = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) HapticFeedbackConstants.CONFIRM
-    else HapticFeedbackConstants.VIRTUAL_KEY
-    view.post { view.performHapticFeedback(effect) }
+    // VIRTUAL_KEY is a single crisp tap everywhere (CONFIRM is already a double-ish pattern on some phones).
+    repeat(pulses) { i ->
+        view.postDelayed({ view.performHapticFeedback(HapticFeedbackConstants.VIRTUAL_KEY) }, i * PULSE_GAP_MS)
+    }
 }
 
 private fun toast(ctx: Context, text: String) {
