@@ -9,7 +9,7 @@
       "author": "Anderinfera",
       "icon": "DownloadIcon",
       "channels": {
-        "latest": "1.4.0"
+        "latest": "1.4.1"
       },
       "versions": {
         "1.0.0": {
@@ -107,6 +107,19 @@
           "url": "https://raw.githubusercontent.com/Anderinfera/revenge-quick-save/main/next/repo/pool/anderinfera.quick-save@1.4.0.zip",
           "sha256": "bdb9fbcfcce1611364f5a1425330a7013669ba82583b4ce3d9cca89dec99dcb0",
           "size": 16011,
+          "dependencies": {
+            "revenge.api": {
+              "version": ">=1 <2"
+            },
+            "discord": {
+              "version": "*"
+            }
+          }
+        },
+        "1.4.1": {
+          "url": "https://raw.githubusercontent.com/Anderinfera/revenge-quick-save/main/next/repo/pool/anderinfera.quick-save@1.4.1.zip",
+          "sha256": "a8c57b71119fa61d800e02e0f6fb092a177f16a21a379e1e30b47f590bd7f445",
+          "size": 16275,
           "dependencies": {
             "revenge.api": {
               "version": ">=1 <2"
