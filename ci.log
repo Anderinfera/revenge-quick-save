@@ -1,0 +1,99 @@
+Downloading https://services.gradle.org/distributions/gradle-9.6.1-bin.zip
+.............10%.............20%..............30%.............40%..............50%.............60%.............70%..............80%.............90%..............100%
+WARNING: A restricted method in java.lang.System has been called
+WARNING: java.lang.System::load has been called by net.rubygrapefruit.platform.internal.NativeLibraryLoader in an unnamed module (file:/home/runner/.gradle/wrapper/dists/gradle-9.6.1-bin/4ticwg1pgcbps2hj28r8so764/gradle-9.6.1/lib/native-platform-0.22-milestone-29.jar)
+WARNING: Use --enable-native-access=ALL-UNNAMED to avoid a warning for callers in this module
+WARNING: Restricted methods will be blocked in a future release unless native access is enabled
+
+
+Welcome to Gradle 9.6.1!
+
+Here are the highlights of this release:
+ - Improved Configuration Cache hit rates
+ - Additional CLI rendering options
+ - Important project hierarchy lookup deprecations
+
+For more details see https://docs.gradle.org/9.6.1/release-notes.html
+
+To honour the JVM settings for this build a single-use Daemon process will be forked. For more on this, please refer to https://docs.gradle.org/9.6.1/userguide/gradle_daemon.html#sec:disabling_the_daemon in the Gradle documentation.
+Daemon will be stopped at the end of the build 
+> Task :core:generateCoreConstants
+> Task :core:androidSourcesJar
+> Task :core:androidPreBuild UP-TO-DATE
+> Task :core:preAndroidMainBuild UP-TO-DATE
+> Task :core:checkAndroidMainAarMetadata
+> Task :core:mergeAndroidMainJniLibFolders
+> Task :core:mergeAndroidMainNativeLibs NO-SOURCE
+> Task :core:copyAndroidMainJniLibsProjectOnly
+> Task :core:extractAndroidMainAnnotations
+> Task :core:generateAndroidMainEmptyResourceFiles
+> Task :core:prepareAndroidMainArtProfile
+> Task :core:prepareLintJarForPublish
+> Task :core:kmpPartiallyResolvedDependenciesChecker
+> Task :core:checkKotlinGradlePluginConfigurationErrors SKIPPED
+> Task :core:processAndroidMainManifest
+> Task :core:writeAndroidMainAarMetadata
+> Task :core:generatePomFileForAndroidPublication
+> Task :core:generateProjectStructureMetadata
+> Task :core:allMetadataJar
+> Task :core:buildKotlinToolingMetadata
+> Task :core:sourcesJar
+> Task :core:generateMetadataFileForKotlinMultiplatformPublication
+> Task :core:generatePomFileForKotlinMultiplatformPublication
+> Task :core:publishKotlinMultiplatformPublicationToMavenLocal
+> Task :android:api:preBuild UP-TO-DATE
+> Task :android:api:preReleaseBuild UP-TO-DATE
+> Task :android:api:checkReleaseAarMetadata
+> Task :android:api:mergeReleaseJniLibFolders
+> Task :android:api:mergeReleaseNativeLibs NO-SOURCE
+> Task :android:api:stripReleaseDebugSymbols NO-SOURCE
+> Task :android:api:copyReleaseJniLibsProjectAndLocalJars
+> Task :android:api:extractDeepLinksForAarRelease
+> Task :android:api:generateReleaseResources
+> Task :android:api:packageReleaseResources
+> Task :android:api:processReleaseNavigationResources
+> Task :android:api:generateReleaseAssets UP-TO-DATE
+> Task :android:api:mergeReleaseAssets
+> Task :android:api:prepareLintJarForPublish
+> Task :android:api:javaPreCompileRelease
+> Task :android:api:prepareReleaseArtProfile
+> Task :android:api:writeReleaseAarMetadata
+> Task :android:api:processReleaseManifest
+> Task :android:api:sourceReleaseJar
+> Task :android:api:generatePomFileForReleasePublication
+> Task :android:api:parseReleaseLocalResources
+> Task :android:api:generateReleaseRFile
+> Task :core:compileAndroidMain
+> Task :core:processAndroidMainJavaRes
+> Task :core:bundleAndroidMainClassesToCompileJar
+> Task :core:mergeAndroidMainJavaResource
+> Task :android:api:extractReleaseAnnotations
+> Task :core:syncAndroidMainLibJars
+> Task :core:bundleAndroidMainAar
+> Task :core:generateMetadataFileForAndroidPublication
+> Task :core:publishAndroidPublicationToMavenLocal
+> Task :core:publishToMavenLocal
+> Task :android:api:compileReleaseKotlin
+> Task :android:api:compileReleaseJavaWithJavac NO-SOURCE
+> Task :android:api:mergeReleaseGeneratedProguardFiles
+> Task :android:api:mergeReleaseConsumerProguardFiles
+> Task :android:api:processReleaseJavaRes
+> Task :android:api:mergeReleaseJavaResource
+> Task :android:api:syncReleaseLibJars
+> Task :android:api:bundleReleaseAar
+> Task :android:api:generateMetadataFileForReleasePublication
+> Task :android:api:publishReleasePublicationToMavenLocal
+> Task :android:api:publishToMavenLocal
+
+[Incubating] Problems report is available at: file:///home/runner/work/_temp/valenced/build/reports/problems/problems-report.html
+
+Deprecated Gradle features were used in this build, making it incompatible with Gradle 10.
+
+You can use '--warning-mode all' to show the individual deprecation warnings and determine if they come from your own scripts or plugins.
+
+For more on this, please refer to https://docs.gradle.org/9.6.1/userguide/command_line_interface.html#sec:command_line_warnings in the Gradle documentation.
+
+BUILD SUCCESSFUL in 1m 38s
+55 actionable tasks: 55 executed
+Consider enabling configuration cache to speed up this build: https://docs.gradle.org/9.6.1/userguide/configuration_cache_enabling.html
+/home/runner/work/_temp/f7899139-0ad9-465e-9890-bc9eada7940f.sh: line 2: ./gradlew: Permission denied
