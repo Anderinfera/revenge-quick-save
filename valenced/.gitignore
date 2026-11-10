@@ -1,0 +1,7 @@
+node_modules/
+plugins/*/build/
+build/
+.gradle/
+.kotlin/
+local.properties
+.cli/
