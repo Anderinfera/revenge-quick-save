@@ -57,17 +57,6 @@ export default function SettingsComponent({ api: { jsonStorage } }: Props) {
 	return (
 		<ScrollView keyboardShouldPersistTaps="handled">
 			<Page>
-				<Text variant="text-sm/medium" color="text-muted">
-					Przycisk pobierania w podglądzie zapisuje pliki z tych kanałów do wybranego folderu (wątki i posty na
-					forum też się liczą). Kanał możesz wyszukać po nazwie albo wkleić jego ID, link do wiadomości lub link
-					do załącznika z tego kanału. Pozostałe kanały zapisują się jak zwykle.
-				</Text>
-				<Text variant="text-sm/medium" color="text-muted">
-					{anywhere
-						? 'Discord ma dostęp do wszystkich plików, więc folder może być dowolny, np. Memy/Funny (od głównego katalogu pamięci) albo /storage/emulated/0/Memy.'
-						: 'Bez dostępu do wszystkich plików ścieżka musi zaczynać się od Pictures, DCIM, Download, Movies, Music albo Documents, np. Pictures/Funny. Żeby zapisywać gdziekolwiek, włącz Discordowi „Dostęp do wszystkich plików” w ustawieniach Androida i otwórz ten ekran ponownie.'}
-				</Text>
-
 				<TableRowGroup title="Kanały i foldery">
 					{rules.length ? (
 						rules.map(rule => (
