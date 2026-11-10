@@ -4,7 +4,18 @@ Dodaje w nagłówku podglądu obrazka (obok menu „…”) dwa przyciski: **Kop
 Zamiast: kliknij obrazek → menu → Save, robisz: kliknij obrazek → Save.
 Używa wbudowanej akcji Save Discorda, więc zapisuje oryginał w pełnej rozdzielczości.
 
-## Instalacja (Revenge Next)
+## Instalacja (Valenced)
+
+Settings → Valenced → Plugins → ikona zębatki → dodaj repozytorium (pełny adres do `index.json`):
+
+```
+https://raw.githubusercontent.com/Anderinfera/revenge-quick-save/main/valenced/repo/index.json
+```
+
+Potem Plugins → `+` (Browse Plugins) → QuickSave → Install. Kod: `valenced/`, CI: `.github/workflows/valenced.yml`
+(działa tak samo jak dla Revenge Next poniżej).
+
+## Instalacja (Revenge Next, porzucony)
 
 Settings → Revenge → Plugins → ikona zębatki → dodaj repozytorium (adres katalogu, bez `index.json` — Revenge dopisuje go sam):
 
